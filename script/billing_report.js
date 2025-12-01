@@ -6,7 +6,6 @@ function loadReport() {
     let m = $('#select_month').val();
     let y = $('#select_year').val();
 
-    // Show Loading
     $('#reportTable tbody').html('<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...</td></tr>');
 
     $.ajax({
@@ -16,19 +15,35 @@ function loadReport() {
         dataType: 'json',
         success: function(res) {
             if (res.status === 'success') {
-                // 1. Update Summary Cards
+                
+                // --- [จุดที่เพิ่ม Logic แจ้งเตือน] ---
+                if (res.rates) {
+                    let e_rate = parseFloat(res.rates.elec);
+                    let w_rate = parseFloat(res.rates.water);
+                    
+                    // เช็คค่าไฟ
+                    if (e_rate > 0) {
+                        $('#lbl_elec_rate').text(e_rate.toFixed(2)).removeClass('text-danger fw-bold').css('font-size', '');
+                    } else {
+                        $('#lbl_elec_rate').text('ยังไม่กำหนด!').addClass('text-danger fw-bold').css('font-size', '1.1em');
+                    }
+
+                    // เช็คค่าน้ำ
+                    if (w_rate > 0) {
+                        $('#lbl_water_rate').text(w_rate.toFixed(2)).removeClass('text-danger fw-bold').css('font-size', '');
+                    } else {
+                        $('#lbl_water_rate').text('ยังไม่กำหนด!').addClass('text-danger fw-bold').css('font-size', '1.1em');
+                    }
+                }
+                // ------------------------------------
+
                 $('#sum_elec').text(res.summary.total_elec);
                 $('#sum_water').text(res.summary.total_water);
-                $('#sum_total').text(res.summary.total_grand_total); // Note: PHP ส่งมาเป็น grand_total แก้ไข key ให้ตรงกัน
-
-                // แก้ไขเล็กน้อย: ใน PHP key คือ 'grand_total'
                 $('#sum_total').text(res.summary.grand_total);
 
-                // 2. Render Table
                 let rows = '';
                 if (res.data.length > 0) {
                     res.data.forEach(row => {
-                        // Format numbers
                         let e_price = parseFloat(row.elec_price).toLocaleString('th-TH', {minimumFractionDigits: 2});
                         let w_price = parseFloat(row.water_price).toLocaleString('th-TH', {minimumFractionDigits: 2});
                         let total = parseFloat(row.total_price).toLocaleString('th-TH', {minimumFractionDigits: 2});

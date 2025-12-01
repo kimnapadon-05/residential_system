@@ -1,13 +1,14 @@
 <?php
 $host = 'localhost';
-$db_name = 'residential_system';
-$username = 'root'; // หรือตามที่คุณตั้ง
-$password = '';     // หรือตามที่คุณตั้ง
+$db_name = 'residential_system'; // <-- เช็คชื่อฐานข้อมูลตรงนี้ให้ตรงกับ phpMyAdmin
+$username = 'root';
+$password = '';
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
+    // ถ้าเชื่อมต่อไม่ได้ ให้หยุดทำงานและแสดง Error ทันที
+    die("Connection failed: " . $e->getMessage());
 }
 ?>

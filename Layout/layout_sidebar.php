@@ -42,6 +42,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="billing_report.php" class="list-group-item list-group-item-action <?php echo ($current_page == 'billing_report.php') ? 'active' : ''; ?>">
             <i class="fas fa-file-invoice-dollar me-2"></i> รายงานค่าใช้จ่าย
         </a>
+
+        <small class="text-muted ms-4 mt-3 mb-1 text-uppercase" style="font-size: 0.7rem;">การตั้งค่า</small>
+        <a href="rate_setting.php" class="list-group-item list-group-item-action <?php echo ($current_page == 'rate_setting.php') ? 'active' : ''; ?>">
+            <i class="fas fa-tags me-2"></i> กำหนดราคาต่อหน่วย
+        </a>
     </div>
 </div>
 
@@ -66,10 +71,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i class="fas fa-user-circle fa-2x text-secondary"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2 text-muted"></i> โปรไฟล์ส่วนตัว</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2 text-muted"></i> ตั้งค่าระบบ</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="login.php"><i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ</a></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -77,3 +84,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </nav>
 
     <div class="container-fluid mt-4 flex-grow-1">
+
+    <script>
+        function logout() {
+            $.ajax({
+                url: '../backend/auth_handler.php',
+                method: 'POST',
+                data: { action: 'logout' },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        window.location.href = 'login.php';
+                    }
+                }
+            });
+        }
+    </script>
