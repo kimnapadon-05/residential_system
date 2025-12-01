@@ -1,0 +1,116 @@
+<?php
+header('Content-Type: application/json');
+require_once '../Database/config.php';
+
+$action = $_POST['action'] ?? '';
+
+if ($action == 'load_sheet') {
+    $month = $_POST['month'];
+    $year = $_POST['year'];
+
+    // 1. ดึงข้อมูลผู้เช่าที่มีมิเตอร์ไฟฟ้า และยังพักอยู่ (หรือย้ายออกในเดือนที่เลือก)
+    // เงื่อนไข: move_out_date เป็น NULL หรือ ย้ายออกหลังวันที่ 1 ของเดือนที่เลือก
+    $startDate = "$year-$month-01";
+    
+    $sql = "SELECT rh.history_id, rh.person_id, rh.house_id, rh.starting_electric_reading,
+            h.house_name, 
+            CONCAT(p.person_fname, ' ', p.person_lname) as fullname,
+            m.meter_serial
+            FROM residency_history rh
+            JOIN house_info h ON rh.house_id = h.house_id
+            JOIN person_info p ON rh.person_id = p.person_id
+            JOIN meter_info m ON rh.electric_meter_id = m.meter_id
+            WHERE rh.electric_meter_id IS NOT NULL 
+            AND (rh.move_out_date IS NULL OR rh.move_out_date >= :startDate)
+            ORDER BY h.house_id ASC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':startDate' => $startDate]);
+    $residents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $data = [];
+    foreach ($residents as $row) {
+        // 2. ตรวจสอบว่าเดือนนี้จดไปหรือยัง?
+        $stmt_curr = $conn->prepare("SELECT * FROM electric_readings WHERE history_id = :hid AND bill_month = :m AND bill_year = :y");
+        $stmt_curr->execute([':hid' => $row['history_id'], ':m' => $month, ':y' => $year]);
+        $current_record = $stmt_curr->fetch(PDO::FETCH_ASSOC);
+
+        // 3. หาเลขมิเตอร์ครั้งก่อน (Previous Reading)
+        // ถ้ามี record เดือนนี้อยู่แล้ว -> ใช้ previous ของ record นั้น
+        // ถ้ายังไม่มี -> ไปหา reading ล่าสุดก่อนหน้านี้ -> ถ้าไม่มีเลย ให้ใช้ starting_reading
+        $prev_reading = 0;
+        
+        if ($current_record) {
+            $prev_reading = $current_record['previous_reading'];
+        } else {
+            // หา reading ล่าสุดที่จดไว้ก่อนเดือนนี้
+            $stmt_prev = $conn->prepare("SELECT current_reading FROM electric_readings WHERE history_id = :hid ORDER BY reading_date DESC LIMIT 1");
+            $stmt_prev->execute([':hid' => $row['history_id']]);
+            $last_bill = $stmt_prev->fetch(PDO::FETCH_ASSOC);
+
+            if ($last_bill) {
+                $prev_reading = $last_bill['current_reading'];
+            } else {
+                $prev_reading = $row['starting_electric_reading']; // ครั้งแรกสุด
+            }
+        }
+
+        $data[] = [
+            'history_id' => $row['history_id'],
+            'house_name' => $row['house_name'],
+            'fullname'   => $row['fullname'],
+            'meter_serial' => $row['meter_serial'],
+            'prev_reading' => $prev_reading,
+            'current_reading' => $current_record ? $current_record['current_reading'] : '', // ถ้ามีค่าแล้วให้แสดง
+            'usage' => $current_record ? $current_record['usage_units'] : '',
+            'reading_id' => $current_record ? $current_record['reading_id'] : null,
+            'is_saved' => $current_record ? true : false
+        ];
+    }
+
+    echo json_encode($data);
+    exit;
+}
+
+if ($action == 'save_reading') {
+    try {
+        $history_id = $_POST['history_id'];
+        $month = $_POST['month'];
+        $year = $_POST['year'];
+        $prev = $_POST['prev_reading'];
+        $curr = $_POST['current_reading'];
+        $usage = $curr - $prev;
+        $date = date('Y-m-d');
+
+        // Validation
+        if ($curr < $prev) {
+            echo json_encode(['status' => 'error', 'message' => 'เลขมิเตอร์ปัจจุบันต้องไม่ต่ำกว่าครั้งก่อน']);
+            exit;
+        }
+
+        // Check Update or Insert
+        $check = $conn->prepare("SELECT reading_id FROM electric_readings WHERE history_id = :hid AND bill_month = :m AND bill_year = :y");
+        $check->execute([':hid' => $history_id, ':m' => $month, ':y' => $year]);
+        $existing = $check->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            // Update
+            $stmt = $conn->prepare("UPDATE electric_readings SET current_reading = :curr, usage_units = :use, reading_date = :d WHERE reading_id = :rid");
+            $stmt->execute([':curr' => $curr, ':use' => $usage, ':d' => $date, ':rid' => $existing['reading_id']]);
+        } else {
+            // Insert
+            $stmt = $conn->prepare("INSERT INTO electric_readings (history_id, bill_month, bill_year, reading_date, previous_reading, current_reading, usage_units) 
+                                    VALUES (:hid, :m, :y, :d, :prev, :curr, :use)");
+            $stmt->execute([
+                ':hid' => $history_id, ':m' => $month, ':y' => $year, 
+                ':d' => $date, ':prev' => $prev, ':curr' => $curr, ':use' => $usage
+            ]);
+        }
+
+        echo json_encode(['status' => 'success', 'message' => 'บันทึกเรียบร้อย', 'usage' => $usage]);
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    exit;
+}
+?>
