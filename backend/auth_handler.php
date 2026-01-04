@@ -70,7 +70,7 @@ if ($action === 'login') {
             
             $attempts = $user['login_attempts'] + 1;
             
-            // [จุดที่แก้ไข] แยก Logic การสร้าง SQL และ Params ให้ชัดเจน
+            // แยก Logic การสร้าง SQL และ Params ให้ชัดเจน
             if ($attempts >= 5) {
                 // เคส: ผิดครบ 5 ครั้ง -> สั่งล็อค 15 นาที
                 $sql = "UPDATE admin_users SET login_attempts = 0, locked_until = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE admin_id = :id";
