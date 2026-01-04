@@ -11,7 +11,7 @@ function loadMeterTable() {
             data.forEach(m => {
                 let typeBadge = m.meter_type == 'electric' 
                     ? '<span class="badge bg-warning text-dark"><i class="fas fa-bolt"></i> ไฟฟ้า</span>' 
-                    : '<span class="badge bg-primary"><i class="fas fa-water"></i> น้ำ</span>';
+                    : '<span class="badge bg-primary"><i class="fa-solid fa-droplet"></i> น้ำ</span>';
                 
                 let brandId = m.brand_id || ''; 
 
