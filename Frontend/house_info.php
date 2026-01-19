@@ -9,6 +9,16 @@
         </button>
     </div>
     <div class="card-body">
+        
+        <div class="row mb-3">
+            <div class="col-md-4 ms-auto">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อบ้าน หรือ โซน...">
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-bordered table-hover" id="houseTable">
                 <thead class="table-light">
@@ -19,9 +29,15 @@
                         <th>จัดการ</th>
                     </tr>
                 </thead>
-                <tbody>
-                    </tbody>
+                <tbody></tbody>
             </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted" id="pageInfo">กำลังโหลด...</span>
+            <nav>
+                <ul class="pagination justify-content-end mb-0" id="paginationControls"></ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -37,16 +53,15 @@
                 <form id="houseForm">
                     <input type="hidden" id="house_id" name="house_id">
                     <input type="hidden" name="action" id="form_action" value="create">
-                    
                     <div class="mb-3">
                         <label>ชื่อบ้านพัก / เลขที่บ้าน</label>
                         <input type="text" class="form-control" name="house_name" id="house_name" required>
                     </div>
-                    
                     <div class="mb-3">
                         <label>โซนที่พัก</label>
                         <select class="form-select" name="location_id" id="location_id" required>
-                            </select>
+                            <option value="">-- เลือกโซน --</option>
+                        </select>
                     </div>
                 </form>
             </div>

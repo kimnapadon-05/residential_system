@@ -2,22 +2,44 @@
 <?php include '../Layout/layout_sidebar.php'; ?>
 
 <div class="card shadow">
-    <div class="card-header bg-warning text-dark d-flex justify-content-between">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
         <h4 class="mb-0">ข้อมูลมิเตอร์น้ำ/ไฟ</h4>
-        <button class="btn btn-light" onclick="openMeterModal()"><i class="fas fa-plus"></i> เพิ่มมิเตอร์</button>
+        <button class="btn btn-light" onclick="openMeterModal()">
+            <i class="fas fa-plus"></i> เพิ่มมิเตอร์
+        </button>
     </div>
     <div class="card-body">
-        <table class="table table-bordered table-hover" id="meterTable">
-            <thead>
-                <tr>
-                    <th>Serial No.</th>
-                    <th>ประเภทหลัก</th>
-                    <th>ยี่ห้อ</th>
-                    <th>จัดการ</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        
+        <div class="row mb-3">
+            <div class="col-md-4 ms-auto">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหา Serial No. หรือ ยี่ห้อ...">
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="meterTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Serial No.</th>
+                        <th>ประเภทการใช้งาน</th>
+                        <th>ยี่ห้อ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted" id="pageInfo">กำลังโหลด...</span>
+            <nav>
+                <ul class="pagination justify-content-end mb-0" id="paginationControls"></ul>
+            </nav>
+        </div>
+
     </div>
 </div>
 

@@ -3,11 +3,16 @@
 <?php include '../Layout/layout_sidebar.php'; ?>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-3 d-print-none">
         <h4 class="mb-0"><i class="fas fa-file-invoice-dollar"></i> รายงานค่าใช้จ่ายรายเดือน</h4>
-        <button onclick="window.print()" class="btn btn-outline-secondary d-print-none">
+        <button onclick="window.print()" class="btn btn-outline-secondary">
             <i class="fas fa-print"></i> พิมพ์รายงาน
         </button>
+    </div>
+
+    <div class="d-none d-print-block text-center mb-4">
+        <h3>รายงานสรุปค่าใช้จ่ายประจำเดือน</h3>
+        <p>ประจำเดือน <span id="print_month_year" class="fw-bold">...</span></p>
     </div>
 
     <div class="card shadow-sm mb-4 d-print-none">
@@ -43,40 +48,43 @@
 
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card text-white bg-warning shadow-sm h-100">
+            <div class="card bg-warning bg-opacity-10 border-warning shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small>ยอดรวมค่าไฟ (<span id="lbl_elec_rate">-</span> บ./หน่วย)</small>
-                            <h3 class="mb-0 fw-bold" id="sum_elec">0.00</h3>
+                            <small class="text-uppercase fw-bold text-warning-emphasis">ยอดรวมค่าไฟ</small>
+                            <h3 class="mb-0 fw-bold text-warning-emphasis" id="sum_elec">0.00</h3>
+                            <small class="d-print-none text-muted">อัตรา: <span id="lbl_elec_rate">ตามพื้นที่</span></small>
                         </div>
-                        <i class="fas fa-bolt fa-2x opacity-50"></i>
+                        <i class="fas fa-bolt fa-2x text-warning opacity-50"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-info shadow-sm h-100">
+            <div class="card bg-info bg-opacity-10 border-info shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small>ยอดรวมค่าน้ำ (<span id="lbl_water_rate">-</span> บ./หน่วย)</small>
-                            <h3 class="mb-0 fw-bold" id="sum_water">0.00</h3>
+                            <small class="text-uppercase fw-bold text-info-emphasis">ยอดรวมค่าน้ำ</small>
+                            <h3 class="mb-0 fw-bold text-info-emphasis" id="sum_water">0.00</h3>
+                            <small class="d-print-none text-muted">อัตรา: <span id="lbl_water_rate">ตามพื้นที่</span></small>
                         </div>
-                        <i class="fas fa-tint fa-2x opacity-50"></i>
+                        <i class="fas fa-tint fa-2x text-info opacity-50"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-success shadow-sm h-100">
+            <div class="card bg-success bg-opacity-10 border-success shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <small>ยอดรวมทั้งหมดที่ต้องเก็บ</small>
-                            <h3 class="mb-0 fw-bold" id="sum_total">0.00</h3>
+                            <small class="text-uppercase fw-bold text-success-emphasis">ยอดรวมสุทธิ</small>
+                            <h3 class="mb-0 fw-bold text-success-emphasis" id="sum_total">0.00</h3>
+                            <small class="d-print-none text-muted">รายรับรวมทั้งหมด</small>
                         </div>
-                        <i class="fas fa-coins fa-2x opacity-50"></i>
+                        <i class="fas fa-coins fa-2x text-success opacity-50"></i>
                     </div>
                 </div>
             </div>
@@ -84,14 +92,15 @@
     </div>
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3 bg-white">
-            <h6 class="m-0 font-weight-bold text-primary">ตารางสรุปค่าใช้จ่าย</h6>
+        <div class="card-header py-3 bg-white d-print-none">
+            <h6 class="m-0 font-weight-bold text-primary">ตารางสรุปค่าใช้จ่ายแยกรายห้อง</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped" id="reportTable" width="100%">
                     <thead class="table-light text-center">
                         <tr>
+                            <th rowspan="2" class="align-middle">โซน</th>
                             <th rowspan="2" class="align-middle">บ้านพัก</th>
                             <th rowspan="2" class="align-middle">ผู้พักอาศัย</th>
                             <th colspan="2" class="bg-warning bg-opacity-10 text-warning-emphasis">ไฟฟ้า</th>
@@ -110,11 +119,26 @@
             </div>
         </div>
     </div>
+    
+    <div class="d-none d-print-block mt-5">
+        <div class="row text-center">
+            <div class="col-6">
+                <p>ลงชื่อ ....................................................... ผู้จัดทำ</p>
+                <p>วันที่ ........./........./.............</p>
+            </div>
+            <div class="col-6">
+                <p>ลงชื่อ ....................................................... ผู้ตรวจสอบ</p>
+                <p>วันที่ ........./........./.............</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
     /* CSS สำหรับหน้า Print */
     @media print {
+        @page { margin: 1cm; size: A4 landscape; } /* แนวนอนเพื่อให้ตารางกว้างพอ */
+        
         body * {
             visibility: hidden;
         }
@@ -144,17 +168,16 @@
             display: none;
         }
 
-        .text-warning-emphasis,
-        .text-info-emphasis {
-            color: #000 !important;
+        /* ให้เส้นตารางชัดขึ้นตอนพิมพ์ */
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #000 !important;
         }
-
-        .bg-warning,
-        .bg-info,
-        .bg-success {
-            background-color: #f8f9fa !important;
-            color: #000 !important;
-            border: 1px solid #dee2e6;
+        
+        /* ปรับสีให้เป็นขาวดำแต่ยังดูออก */
+        .text-warning-emphasis, .text-info-emphasis, .text-success-emphasis {
+            color: black !important;
+            font-weight: bold;
         }
     }
 </style>
