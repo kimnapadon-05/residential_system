@@ -10,7 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f0f2f5; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background-color: #f0f2f5; 
+            min-height: 100vh; /* ให้หน้าจอมีความสูงอย่างน้อยเต็มจอ */
+            display: flex;
+            flex-direction: column;
+        }
+        
         .container-search { max-width: 900px; margin: 40px auto; }
         
         .invoice-box {
@@ -19,17 +26,77 @@
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             display: none; 
+            width: 100%;          /* ยืดให้เต็ม Wrapper */
+            max-width: 210mm;     /* แต่ไม่เกิน A4 */
         }
         
         .invoice-header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
         .table-invoice th { background-color: #f8f9fa; text-align: center; vertical-align: middle; }
         .table-invoice td { vertical-align: middle; }
         
+        /* จัดให้อยู่กึ่งกลางหน้าจอ */
+        .invoice-wrapper {
+            display: flex;
+            justify-content: center; /* กึ่งกลางแนวนอน */
+            width: 100%;
+            padding: 0 15px; /* เว้นขอบซ้ายขวาเล็กน้อยกันชิดขอบจอเกินไปในมือถือ */
+        }
+
         @media print {
-            body * { visibility: hidden; }
-            .invoice-box, .invoice-box * { visibility: visible; }
-            .invoice-box { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; box-shadow: none; display: block !important; }
+
+            @page { 
+            size: A4 portrait;
+            /* กำหนดขอบ: บน ขวา ล่าง ซ้าย */
+            /* ตัวอย่าง: บน 20mm, ขวา 10mm, ล่าง 10mm, ซ้าย 10mm */
+            margin: 20mm 10mm 10mm 10mm; 
+        }
+            /* 1. ซ่อนส่วนที่ไม่ต้องการ (ปุ่ม, เมนูค้นหา) */
             .no-print { display: none !important; }
+            
+            /* 2. รีเซ็ตพื้นหลังเป็นสีขาว */
+            body, html { 
+                background-color: white !important; 
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* 3. จัด Wrapper ให้ยึดตำแหน่งหัวกระดาษและจัดกึ่งกลาง */
+            .invoice-wrapper {
+                position: absolute; /* ยึดกับมุมกระดาษ */
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                
+                /* ใช้ Flexbox จัดกึ่งกลางแนวนอน */
+                display: flex !important;
+                justify-content: center !important; 
+                align-items: flex-start !important; 
+            }
+
+            /* 4. ปรับกล่องใบแจ้งหนี้ให้พอดีกระดาษ */
+            .invoice-box {
+                display: block !important;
+                
+                /* กำหนดขนาดให้พอดี A4 */
+                width: 100% !important;
+                max-width: 210mm !important; 
+                
+                /* คำสั่งจัดกึ่งกลาง (สำคัญ) */
+                margin: 0 auto !important;   
+                
+                /* ยกเลิกการบังคับตำแหน่งแบบเดิม */
+                position: static !important; 
+                left: auto !important;
+                top: auto !important;
+                
+                /* ตกแต่งเล็กน้อย */
+                padding: 20px !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important; /* ใส่ขอบบางๆ ให้ดูเป็นเอกสาร */
+            }
         }
     </style>
 </head>
@@ -83,8 +150,9 @@
         </div>
     </div>
 
-    <div class="container mb-5">
-        <div id="invoiceArea" class="invoice-box mx-auto" style="max-width: 210mm;"> 
+    <div class="invoice-wrapper mb-5">
+        <div id="invoiceArea" class="invoice-box"> 
+            
             <div class="invoice-header d-flex justify-content-between align-items-start">
                 <div>
                     <h4 class="fw-bold text-dark">ใบแจ้งหนี้ / Invoice</h4>
@@ -162,7 +230,7 @@
             </table>
 
             <div class="mt-5 p-3 bg-light border rounded text-center">
-                <p class="mb-1 text-danger fw-bold"><i class="fas fa-exclamation-circle"></i> กรุณาชำระเงินภายในวันที่ 5 ของเดือนถัดไป</p>
+                <!-- <p class="mb-1 text-danger fw-bold"><i class="fas fa-exclamation-circle"></i> กรุณาชำระเงินภายในวันที่ 5 ของเดือนถัดไป</p> -->
                 <small class="text-muted">หากมีข้อสงสัยกรุณาติดต่อเจ้าหน้าที่ดูแลระบบ</small>
             </div>
 
