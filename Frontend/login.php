@@ -9,7 +9,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #eef2f7; font-family: 'Kanit', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        body { 
+            background-color: #eef2f7; 
+            font-family: 'Kanit', sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0; /* เพิ่มเพื่อให้แน่ใจว่าไม่มี margin */
+        }
         .login-card { width: 100%; max-width: 400px; border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
         .card-header { background: #2c3e50; color: white; padding: 30px 20px; text-align: center; border: none; }
         .btn-login { background: #f1c40f; color: #2c3e50; font-weight: bold; transition: 0.3s; }
@@ -68,16 +76,28 @@ $(document).ready(function() {
                         title: 'ยินดีต้อนรับ',
                         text: 'กำลังเข้าสู่ระบบ...',
                         timer: 1500,
-                        showConfirmButton: false
+                        showConfirmButton: false,
+                        heightAuto: false // ป้องกันหน้าจอขยับ
                     }).then(() => {
                         window.location.href = 'index.php';
                     });
                 } else {
-                    Swal.fire('แจ้งเตือน', res.message, 'error');
+                    // เปลี่ยนรูปแบบการเรียกใช้เพื่อให้ใส่ heightAuto ได้
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'แจ้งเตือน',
+                        text: res.message,
+                        heightAuto: false // ป้องกันหน้าจอขยับ
+                    });
                 }
             },
             error: function() {
-                Swal.fire('Error', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+                    heightAuto: false // ป้องกันหน้าจอขยับ
+                });
             }
         });
     });
