@@ -137,48 +137,64 @@
 <style>
     /* CSS สำหรับหน้า Print */
     @media print {
-        @page { margin: 1cm; size: A4 landscape; } /* แนวนอนเพื่อให้ตารางกว้างพอ */
-        
-        body * {
-            visibility: hidden;
+        /* 1. ตั้งค่าหน้ากระดาษ: แนวนอน, ขอบ 10mm */
+        @page { 
+            size: A4 landscape;
+            margin: 10mm; 
         }
 
-        .container-fluid,
-        .container-fluid * {
-            visibility: visible;
-        }
-
-        .container-fluid {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
-
-        .d-print-none {
+        /* 2. ซ่อนองค์ประกอบที่ไม่ต้องการให้เกลี้ยง */
+        #sidebar-wrapper, .navbar, #menu-toggle, .btn, footer, .d-print-none,
+        /* ซ่อน Scrollbar ที่อาจติดมา */
+        ::-webkit-scrollbar {
             display: none !important;
         }
 
+        /* 3. รีเซ็ตพื้นหลังและระยะขอบ */
+        body, html, #wrapper, #page-content-wrapper, .container-fluid {
+            background-color: white !important;
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        /* 4. จัดการตารางและการ์ด */
         .card {
             border: none !important;
             box-shadow: none !important;
         }
-
-        .card-header {
-            display: none;
+        
+        .table-responsive {
+            overflow: visible !important;
+            margin-bottom: 0 !important;
         }
 
-        /* ให้เส้นตารางชัดขึ้นตอนพิมพ์ */
-        .table-bordered th,
-        .table-bordered td {
-            border: 1px solid #000 !important;
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #000 !important; /* เส้นสีดำชัดเจน */
+            padding: 5px !important; /* ลดช่องว่างในตารางให้กระชับ */
+            font-size: 11pt; /* ขนาดตัวอักษรพอดีอ่าน */
+        }
+
+        /* 5. บังคับแสดงหัวกระดาษและลายเซ็น */
+        .d-print-block {
+            display: block !important;
+        }
+
+        /* 6. ปรับสีตัวอักษรเป็นสีดำ (สำหรับเครื่องพิมพ์ขาวดำ) */
+        * {
+            -webkit-print-color-adjust: exact !important; /* บังคับพิมพ์สีพื้นหลัง (ถ้ามี) */
+            color: black !important;
         }
         
-        /* ปรับสีให้เป็นขาวดำแต่ยังดูออก */
-        .text-warning-emphasis, .text-info-emphasis, .text-success-emphasis {
-            color: black !important;
-            font-weight: bold;
+        /* ยกเว้น Badge สถานะ ให้ยังคงมีพื้นหลังจางๆ ได้ถ้าต้องการ */
+        .bg-warning, .bg-info, .bg-success, .bg-light {
+            background-color: transparent !important; /* หรือใส่สีถ้าต้องการ */
         }
+        
+        /* ซ่อน Title ของ Browser (บางรุ่นช่วยได้) */
+        title { display: none; }
     }
 </style>
 
