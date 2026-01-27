@@ -79,7 +79,7 @@ $(document).ready(function() {
                         showConfirmButton: false,
                         heightAuto: false // ป้องกันหน้าจอขยับ
                     }).then(() => {
-                        window.location.href = 'index.php';
+                        window.location.href = 'dashboard.php';
                     });
                 } else {
                     // เปลี่ยนรูปแบบการเรียกใช้เพื่อให้ใส่ heightAuto ได้
