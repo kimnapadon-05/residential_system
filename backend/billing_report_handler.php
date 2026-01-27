@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../Database/config.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
 
 $action = $_POST['action'] ?? '';
 
@@ -10,32 +10,33 @@ if ($action == 'get_report') {
     $startDate = "$year-$month-01";
 
     try {
-        // แก้ไข SQL: JOIN ตาราง utility_rates ให้ตรงกับ location_id ของบ้าน
+        // ✅ แก้ไข SQL: JOIN ตาราง utility_rates ให้ตรงกับ location_id ของบ้าน
         $sql = "SELECT 
                     rh.history_id, 
                     h.house_name, 
-                    l.location_name, -- เพิ่มชื่อโซน
+                    l.location_name,
                     CONCAT(p.person_fname, ' ', p.person_lname) as fullname,
-                    er.usage_units as elec_units,
-                    wr.usage_units as water_units,
-                    ur.elec_rate,  -- ดึงราคาจากตาราง rates โดยตรง
-                    ur.water_rate
+                    COALESCE(er.usage_units, 0) as elec_units,
+                    COALESCE(wr.usage_units, 0) as water_units,
+                    COALESCE(ur.elec_rate, 0) as elec_rate,
+                    COALESCE(ur.water_rate, 0) as water_rate
                 FROM residency_history rh
-                JOIN house_info h ON rh.house_id = h.house_id
-                JOIN house_location l ON h.location_id = l.location_id -- เชื่อมบ้านกับโซน
-                JOIN person_info p ON rh.person_id = p.person_id
-                -- ดึงหน่วยที่จด
-                LEFT JOIN electric_readings er ON rh.history_id = er.history_id AND er.bill_month = :m AND er.bill_year = :y
-                LEFT JOIN water_readings wr ON rh.history_id = wr.history_id AND wr.bill_month = :m AND wr.bill_year = :y
-                -- ดึงราคาตามโซน (สำคัญมาก!)
-                LEFT JOIN utility_rates ur ON l.location_id = ur.location_id AND ur.bill_month = :m AND ur.bill_year = :y
+                INNER JOIN house_info h ON rh.house_id = h.house_id
+                INNER JOIN house_location l ON h.location_id = l.location_id
+                INNER JOIN person_info p ON rh.person_id = p.person_id
+                LEFT JOIN electric_readings er ON rh.history_id = er.history_id 
+                    AND er.bill_month = :month AND er.bill_year = :year
+                LEFT JOIN water_readings wr ON rh.history_id = wr.history_id 
+                    AND wr.bill_month = :month AND wr.bill_year = :year
+                LEFT JOIN utility_rates ur ON l.location_id = ur.location_id 
+                    AND ur.bill_month = :month AND ur.bill_year = :year
                 WHERE 
                     rh.move_in_date <= LAST_DAY(:start_date)
                     AND (rh.move_out_date IS NULL OR rh.move_out_date >= :start_date)
                 ORDER BY l.location_id ASC, h.house_id ASC";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute([':m' => $month, ':y' => $year, ':start_date' => $startDate]);
+        $stmt->execute([':month' => $month, ':year' => $year, ':start_date' => $startDate]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $reportData = [];

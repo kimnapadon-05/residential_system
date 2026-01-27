@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../Database/config.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
 
 $action = $_POST['action'] ?? '';
 

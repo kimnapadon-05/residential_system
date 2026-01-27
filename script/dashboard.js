@@ -1,3 +1,6 @@
+// ✅ dashboard.js - Load statistics and charts
+// Backend: ../backend/dashboard_handler.php
+
 $(document).ready(function() {
     loadDashboardData();
 });
@@ -9,6 +12,11 @@ function loadDashboardData() {
         data: { action: 'get_stats' },
         dataType: 'json',
         success: function(data) {
+            if (!data || !data.stats) {
+                console.error('Invalid response format:', data);
+                return;
+            }
+
             if (data.status === 'success') {
                 // 1. Update Cards
                 $('#stat_total_houses').text(data.stats.total_houses);
@@ -18,7 +26,7 @@ function loadDashboardData() {
 
                 // 2. Update List
                 let listHtml = '';
-                if (data.recent_movein.length > 0) {
+                if (data.recent_movein && data.recent_movein.length > 0) {
                     data.recent_movein.forEach(item => {
                         listHtml += `
                             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -36,8 +44,15 @@ function loadDashboardData() {
                 $('#recent_list').html(listHtml);
 
                 // 3. Render Chart
-                renderChart(data.chart);
+                if (data.chart) {
+                    renderChart(data.chart);
+                }
+            } else {
+                console.error('API error:', data.message);
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
         }
     });
 }

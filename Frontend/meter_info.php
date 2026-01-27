@@ -1,5 +1,8 @@
-<?php include '../Layout/layout_header.php'; ?>
-<?php include '../Layout/layout_sidebar.php'; ?>
+<?php 
+// ใช้ realpath สำหรับ Plesk compatibility
+require_once realpath(__DIR__ . '/../Layout/layout_header.php');
+require_once realpath(__DIR__ . '/../Layout/layout_sidebar.php');
+?>
 
 <div class="card shadow">
     <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">

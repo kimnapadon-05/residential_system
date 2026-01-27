@@ -1,3 +1,6 @@
+// ✅ water_recording.js - Handle water meter recordings  
+// Backend: ../backend/water_recording_handler.php
+
 $(document).ready(function() {
     loadSheet();
 });
@@ -6,15 +9,19 @@ function loadSheet() {
     let m = $('#select_month').val();
     let y = $('#select_year').val();
 
-    $('#recordingTable tbody').html('<tr><td colspan="7" class="text-center">กำลังโหลดข้อมูล...</td></tr>');
+    $('#recordingTable tbody').html('<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>');
 
     $.ajax({
-        // เรียกไฟล์ Backend ของค่าน้ำ
         url: '../backend/water_recording_handler.php',
         method: 'POST',
         data: { action: 'load_sheet', month: m, year: y },
         dataType: 'json',
         success: function(data) {
+            if (!data || !Array.isArray(data)) {
+                console.error('Invalid response format:', data);
+                $('#recordingTable tbody').html('<tr><td colspan="7" class="text-center text-danger">ข้อมูลไม่ถูกต้อง</td></tr>');
+                return;
+            }
             let rows = '';
             if (data.length === 0) {
                 rows = '<tr><td colspan="7" class="text-center text-muted">ไม่พบรายการบ้านพักที่มีมิเตอร์น้ำ หรือไม่มีผู้เข้าพักในเดือนนี้</td></tr>';
@@ -117,6 +124,11 @@ function saveRow(id) {
                 Swal.fire('Error', res.message, 'error');
                 btn.html(originalText).prop('disabled', false);
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('Save Error:', error);
+            Swal.fire('Error', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+            btn.html(originalText).prop('disabled', false);
         }
     });
 }

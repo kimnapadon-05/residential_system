@@ -1,4 +1,8 @@
-<?php include '../backend/auth_guard.php'; ?>
+<?php 
+// ✅ Load authentication guard (check if user is logged in)
+// Uses realpath() in auth_guard.php for Plesk compatibility
+include realpath(__DIR__ . '/../backend/auth_guard.php'); 
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>

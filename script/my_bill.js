@@ -1,8 +1,11 @@
+// ✅ my_bill.js - Handle bill lookup for public users
+// Backend: ../backend/my_bill_handler.php
+
 $(document).ready(function() {
     loadHouses();
 });
 
-// โหลดรายชื่อบ้านใส่ Dropdown
+// ✅ Load house list into dropdown
 function loadHouses() {
     $.ajax({
         url: '../backend/my_bill_handler.php',
@@ -10,16 +13,24 @@ function loadHouses() {
         data: { action: 'get_houses' },
         dataType: 'json',
         success: function(data) {
+            if (!data || typeof data !== 'object') {
+                console.error('Invalid response:', data);
+                return;
+            }
+
             let opts = '<option value="">-- กรุณาเลือกบ้าน --</option>';
             data.forEach(h => {
                 opts += `<option value="${h.house_id}">${h.house_name}</option>`;
             });
             $('#house_id').html(opts);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading houses:', error);
         }
     });
 }
 
-// กดค้นหาบิล
+// ✅ Check bill when search button clicked
 function checkBill() {
     let hid = $('#house_id').val();
     let m = $('#month').val();
@@ -31,7 +42,7 @@ function checkBill() {
         return;
     }
 
-    // แสดง Loading
+    // Show loading
     Swal.fire({
         title: 'กำลังค้นหา...',
         text: 'กรุณารอสักครู่',
@@ -46,6 +57,11 @@ function checkBill() {
         dataType: 'json',
         success: function(res) {
             Swal.close();
+
+            if (!res) {
+                Swal.fire('Error', 'ไม่มีข้อมูลตอบกลับจากเซิร์ฟเวอร์', 'error');
+                return;
+            }
 
             if (res.status === 'success') {
                 let d = res.data;

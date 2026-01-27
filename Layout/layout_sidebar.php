@@ -1,5 +1,6 @@
 <?php 
-// หาชื่อไฟล์ปัจจุบัน
+// ✅ Get current page name for active menu highlighting
+// This will work on both XAMPP and Plesk
 $current_page = basename($_SERVER['PHP_SELF']); 
 ?>
 
@@ -86,9 +87,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="container-fluid mt-4 flex-grow-1">
 
     <script>
+        // ✅ Logout function - calls backend handler via AJAX
         function logout() {
             $.ajax({
-                url: '../backend/auth_handler.php',
+                url: '../backend/auth_handler.php',  // Relative path works on all servers
                 method: 'POST',
                 data: { action: 'logout' },
                 dataType: 'json',

@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../Database/config.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
 
 $action = $_POST['action'] ?? '';
 
@@ -29,8 +29,8 @@ if ($action == 'load_sheet') {
     $data = [];
     foreach ($residents as $row) {
         // 2. ตรวจสอบว่าเดือนนี้จดไปหรือยัง? (ตาราง water_readings)
-        $stmt_curr = $conn->prepare("SELECT * FROM water_readings WHERE history_id = :hid AND bill_month = :m AND bill_year = :y");
-        $stmt_curr->execute([':hid' => $row['history_id'], ':m' => $month, ':y' => $year]);
+        $stmt_curr = $conn->prepare("SELECT * FROM water_readings WHERE history_id = :history_id AND bill_month = :month AND bill_year = :year");
+        $stmt_curr->execute([':history_id' => $row['history_id'], ':month' => $month, ':year' => $year]);
         $current_record = $stmt_curr->fetch(PDO::FETCH_ASSOC);
 
         // 3. หาเลขมิเตอร์ครั้งก่อน
@@ -39,8 +39,8 @@ if ($action == 'load_sheet') {
             $prev_reading = $current_record['previous_reading'];
         } else {
             // หา reading ล่าสุดก่อนหน้านี้
-            $stmt_prev = $conn->prepare("SELECT current_reading FROM water_readings WHERE history_id = :hid ORDER BY reading_date DESC LIMIT 1");
-            $stmt_prev->execute([':hid' => $row['history_id']]);
+            $stmt_prev = $conn->prepare("SELECT current_reading FROM water_readings WHERE history_id = :history_id ORDER BY reading_date DESC LIMIT 1");
+            $stmt_prev->execute([':history_id' => $row['history_id']]);
             $last_bill = $stmt_prev->fetch(PDO::FETCH_ASSOC);
 
             if ($last_bill) {
@@ -83,19 +83,19 @@ if ($action == 'save_reading') {
         }
 
         // Check Update or Insert (ตาราง water_readings)
-        $check = $conn->prepare("SELECT reading_id FROM water_readings WHERE history_id = :hid AND bill_month = :m AND bill_year = :y");
-        $check->execute([':hid' => $history_id, ':m' => $month, ':y' => $year]);
+        $check = $conn->prepare("SELECT reading_id FROM water_readings WHERE history_id = :history_id AND bill_month = :month AND bill_year = :year");
+        $check->execute([':history_id' => $history_id, ':month' => $month, ':year' => $year]);
         $existing = $check->fetch(PDO::FETCH_ASSOC);
 
         if ($existing) {
-            $stmt = $conn->prepare("UPDATE water_readings SET current_reading = :curr, usage_units = :use, reading_date = :d WHERE reading_id = :rid");
-            $stmt->execute([':curr' => $curr, ':use' => $usage, ':d' => $date, ':rid' => $existing['reading_id']]);
+            $stmt = $conn->prepare("UPDATE water_readings SET current_reading = :current_reading, usage_units = :usage_units, reading_date = :reading_date WHERE reading_id = :reading_id");
+            $stmt->execute([':current_reading' => $curr, ':usage_units' => $usage, ':reading_date' => $date, ':reading_id' => $existing['reading_id']]);
         } else {
             $stmt = $conn->prepare("INSERT INTO water_readings (history_id, bill_month, bill_year, reading_date, previous_reading, current_reading, usage_units) 
-                                    VALUES (:hid, :m, :y, :d, :prev, :curr, :use)");
+                                    VALUES (:history_id, :month, :year, :date, :prev_reading, :current_reading, :usage_units)");
             $stmt->execute([
-                ':hid' => $history_id, ':m' => $month, ':y' => $year, 
-                ':d' => $date, ':prev' => $prev, ':curr' => $curr, ':use' => $usage
+                ':history_id' => $history_id, ':month' => $month, ':year' => $year, 
+                ':date' => $date, ':prev_reading' => $prev, ':current_reading' => $curr, ':usage_units' => $usage
             ]);
         }
 

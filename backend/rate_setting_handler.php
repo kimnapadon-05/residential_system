@@ -1,5 +1,5 @@
 <?php
-require_once '../Database/config.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? '';
@@ -34,16 +34,16 @@ if ($action == 'save') {
     try {
         // เพิ่ม location_id เข้าไปใน SQL
         $sql = "INSERT INTO utility_rates (location_id, bill_month, bill_year, elec_rate, water_rate) 
-                VALUES (:loc, :m, :y, :e, :w)
-                ON DUPLICATE KEY UPDATE elec_rate = :e, water_rate = :w";
+                VALUES (:location_id, :month, :year, :elec_rate, :water_rate)
+                ON DUPLICATE KEY UPDATE elec_rate = VALUES(elec_rate), water_rate = VALUES(water_rate)";
         
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            ':loc' => $loc,
-            ':m' => $m, 
-            ':y' => $y, 
-            ':e' => $e_rate, 
-            ':w' => $w_rate
+            ':location_id' => $loc,
+            ':month' => $m, 
+            ':year' => $y, 
+            ':elec_rate' => $e_rate, 
+            ':water_rate' => $w_rate
         ]);
         echo json_encode(['status' => 'success', 'message' => 'บันทึกอัตราค่าบริการเรียบร้อย']);
     } catch (PDOException $e) {

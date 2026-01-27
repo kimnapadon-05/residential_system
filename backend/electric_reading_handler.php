@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../Database/config.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
 
 $action = $_POST['action'] ?? '';
 
@@ -31,8 +31,8 @@ if ($action == 'load_sheet') {
     $data = [];
     foreach ($residents as $row) {
         // 2. ตรวจสอบว่าเดือนนี้จดไปหรือยัง?
-        $stmt_curr = $conn->prepare("SELECT * FROM electric_readings WHERE history_id = :hid AND bill_month = :m AND bill_year = :y");
-        $stmt_curr->execute([':hid' => $row['history_id'], ':m' => $month, ':y' => $year]);
+        $stmt_curr = $conn->prepare("SELECT * FROM electric_readings WHERE history_id = :history_id AND bill_month = :month AND bill_year = :year");
+        $stmt_curr->execute([':history_id' => $row['history_id'], ':month' => $month, ':year' => $year]);
         $current_record = $stmt_curr->fetch(PDO::FETCH_ASSOC);
 
         // 3. หาเลขมิเตอร์ครั้งก่อน (Previous Reading)
@@ -44,8 +44,8 @@ if ($action == 'load_sheet') {
             $prev_reading = $current_record['previous_reading'];
         } else {
             // หา reading ล่าสุดที่จดไว้ก่อนเดือนนี้
-            $stmt_prev = $conn->prepare("SELECT current_reading FROM electric_readings WHERE history_id = :hid ORDER BY reading_date DESC LIMIT 1");
-            $stmt_prev->execute([':hid' => $row['history_id']]);
+            $stmt_prev = $conn->prepare("SELECT current_reading FROM electric_readings WHERE history_id = :history_id ORDER BY reading_date DESC LIMIT 1");
+            $stmt_prev->execute([':history_id' => $row['history_id']]);
             $last_bill = $stmt_prev->fetch(PDO::FETCH_ASSOC);
 
             if ($last_bill) {
@@ -89,8 +89,8 @@ if ($action == 'save_reading') {
         }
 
         // Check Update or Insert
-        $check = $conn->prepare("SELECT reading_id FROM electric_readings WHERE history_id = :hid AND bill_month = :m AND bill_year = :y");
-        $check->execute([':hid' => $history_id, ':m' => $month, ':y' => $year]);
+        $check = $conn->prepare("SELECT reading_id FROM electric_readings WHERE history_id = :history_id AND bill_month = :month AND bill_year = :year");
+        $check->execute([':history_id' => $history_id, ':month' => $month, ':year' => $year]);
         $existing = $check->fetch(PDO::FETCH_ASSOC);
 
         if ($existing) {
@@ -100,10 +100,10 @@ if ($action == 'save_reading') {
         } else {
             // Insert
             $stmt = $conn->prepare("INSERT INTO electric_readings (history_id, bill_month, bill_year, reading_date, previous_reading, current_reading, usage_units) 
-                                    VALUES (:hid, :m, :y, :d, :prev, :curr, :use)");
+                                    VALUES (:history_id, :month, :year, :date, :prev_reading, :current_reading, :usage_units)");
             $stmt->execute([
-                ':hid' => $history_id, ':m' => $month, ':y' => $year, 
-                ':d' => $date, ':prev' => $prev, ':curr' => $curr, ':use' => $usage
+                ':history_id' => $history_id, ':month' => $month, ':year' => $year, 
+                ':date' => $date, ':prev_reading' => $prev, ':current_reading' => $curr, ':usage_units' => $usage
             ]);
         }
 

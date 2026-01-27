@@ -1,24 +1,24 @@
-// house_handler.js
+// ✅ house_handler.js - Handle CRUD operations for house management
+// Backend: ../backend/house_handler.php
 
 let currentPage = 1;
 const itemsPerPage = 10;
-// ไม่ต้องประกาศ searchTimer แล้ว
 
 $(document).ready(function() {
     loadTable(currentPage);
     loadLocations();
 
-    // ค้นหาทันทีที่พิมพ์ (Real-time Fetching)
+    // ✅ Real-time search as user types
     $('#searchInput').on('input', function() {
         let query = $(this).val();
-        currentPage = 1; // รีเซ็ตกลับไปหน้า 1 เสมอเมื่อค้นหาใหม่
+        currentPage = 1; // Reset to first page
         loadTable(currentPage, query);
     });
 });
 
 function loadTable(page, search = '') {
     currentPage = page;
-    if(search === '') search = $('#searchInput').val(); // กันเหนียวกรณีเปลี่ยนหน้า
+    if(search === '') search = $('#searchInput').val();
 
     $.ajax({
         url: '../backend/house_handler.php',
@@ -26,6 +26,12 @@ function loadTable(page, search = '') {
         data: { action: 'read', page: page, limit: itemsPerPage, search: search },
         dataType: 'json',
         success: function(res) {
+            if (!res || res.status === 'error') {
+                console.error('Error loading houses:', res ? res.message : 'Unknown error');
+                $('#houseTable tbody').html('<tr><td colspan="4" class="text-center text-danger">ไม่สามารถโหลดข้อมูล</td></tr>');
+                return;
+            }
+
             let rows = '';
             if (res.data.length > 0) {
                 res.data.forEach(row => {
@@ -47,6 +53,10 @@ function loadTable(page, search = '') {
             if(res.pagination) {
                 renderPagination(res.pagination);
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+            $('#houseTable tbody').html('<tr><td colspan="4" class="text-center text-danger">เกิดข้อผิดพลาดในการเชื่อมต่อ</td></tr>');
         }
     });
 }

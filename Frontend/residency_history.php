@@ -1,5 +1,7 @@
-<?php include '../Layout/layout_header.php'; ?>
-<?php include '../Layout/layout_sidebar.php'; ?>
+<?php 
+require_once realpath(__DIR__ . '/../Layout/layout_header.php');
+require_once realpath(__DIR__ . '/../Layout/layout_sidebar.php');
+?>
 
 <div class="card shadow mb-4">
     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">

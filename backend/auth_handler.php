@@ -1,6 +1,6 @@
 <?php
-require_once '../Database/config.php';
-require_once 'security_helper.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
+require_once realpath(__DIR__ . '/security_helper.php');
 
 header('Content-Type: application/json');
 

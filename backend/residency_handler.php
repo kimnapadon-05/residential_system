@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../Database/config.php';
+require_once realpath(__DIR__ . '/../Database/config.php');
 
 $action = $_POST['action'] ?? '';
 
@@ -84,10 +84,10 @@ if ($action == 'get_last_reading') {
         $house_id = $_POST['house_id'];
         $sql = "SELECT final_electric_reading, final_water_reading 
                 FROM residency_history 
-                WHERE house_id = :hid 
+                WHERE house_id = :house_id 
                 ORDER BY history_id DESC LIMIT 1";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([':hid' => $house_id]);
+        $stmt->execute([':house_id' => $house_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         echo json_encode($result ?: ['final_electric_reading' => 0, 'final_water_reading' => 0]);

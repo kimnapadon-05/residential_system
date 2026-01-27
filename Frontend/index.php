@@ -28,51 +28,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
 
     if ($house_id && $month && $year) {
         try {
-            // ดึงราคา
-            $stmtRate = $conn->prepare("SELECT elec_rate, water_rate FROM utility_rates WHERE bill_month = :m AND bill_year = :y");
-            $stmtRate->execute([':m' => $month, ':y' => $year]);
+            // ✅ 1. ดึง location_id จากบ้าน
+            $stmtLocation = $conn->prepare("SELECT location_id FROM house_info WHERE house_id = :house_id");
+            $stmtLocation->execute([':house_id' => $house_id]);
+            $houseInfo = $stmtLocation->fetch(PDO::FETCH_ASSOC);
+            $location_id = $houseInfo ? intval($houseInfo['location_id']) : 0;
+
+            // ✅ 2. ดึงราคาค่าไฟและน้ำตามโซน (location)
+            $stmtRate = $conn->prepare("SELECT elec_rate, water_rate FROM utility_rates WHERE location_id = :location_id AND bill_month = :month AND bill_year = :year");
+            $stmtRate->execute([':location_id' => $location_id, ':month' => $month, ':year' => $year]);
             $rates = $stmtRate->fetch(PDO::FETCH_ASSOC);
 
             $ELEC_RATE = $rates ? floatval($rates['elec_rate']) : 7.0;
             $WATER_RATE = $rates ? floatval($rates['water_rate']) : 15.0;
 
-            // ดึงข้อมูลบิล
-            $sql = "SELECT h.house_name, CONCAT(p.person_fname, ' ', p.person_lname) as fullname,
-                        er.previous_reading as e_prev, er.current_reading as e_curr, er.usage_units as e_units,
-                        wr.previous_reading as w_prev, wr.current_reading as w_curr, wr.usage_units as w_units
+            // ✅ ดึงข้อมูลบิล (ผู้พักอาศัย, มิเตอร์, เลขปัจจุบันและก่อนหน้า)
+            $sql = "SELECT h.house_name, 
+                        CONCAT(p.person_fname, ' ', p.person_lname) as fullname,
+                        COALESCE(er.previous_reading, 0) as e_prev, 
+                        COALESCE(er.current_reading, 0) as e_curr, 
+                        COALESCE(er.usage_units, 0) as e_units,
+                        COALESCE(wr.previous_reading, 0) as w_prev, 
+                        COALESCE(wr.current_reading, 0) as w_curr, 
+                        COALESCE(wr.usage_units, 0) as w_units
                     FROM residency_history rh
-                    JOIN house_info h ON rh.house_id = h.house_id
-                    JOIN person_info p ON rh.person_id = p.person_id
-                    LEFT JOIN electric_readings er ON rh.history_id = er.history_id AND er.bill_month = :m AND er.bill_year = :y
-                    LEFT JOIN water_readings wr ON rh.history_id = wr.history_id AND wr.bill_month = :m AND wr.bill_year = :y
-                    WHERE rh.house_id = :hid
-                    AND (rh.move_out_date IS NULL OR (MONTH(rh.move_out_date) >= :m AND YEAR(rh.move_out_date) = :y))
-                    ORDER BY rh.history_id DESC LIMIT 1";
+                    INNER JOIN house_info h ON rh.house_id = h.house_id
+                    INNER JOIN person_info p ON rh.person_id = p.person_id
+                    LEFT JOIN electric_readings er ON rh.history_id = er.history_id 
+                        AND er.bill_month = :month AND er.bill_year = :year
+                    LEFT JOIN water_readings wr ON rh.history_id = wr.history_id 
+                        AND wr.bill_month = :month AND wr.bill_year = :year
+                    WHERE rh.house_id = :house_id
+                    AND (rh.move_out_date IS NULL 
+                        OR (YEAR(rh.move_out_date) = :year AND MONTH(rh.move_out_date) >= :month))
+                    ORDER BY rh.history_id DESC 
+                    LIMIT 1";
 
             $stmt = $conn->prepare($sql);
-            $stmt->execute([':hid' => $house_id, ':m' => $month, ':y' => $year]);
+            $stmt->execute([
+                ':house_id' => $house_id, 
+                ':month' => $month, 
+                ':year' => $year
+            ]);
             $bill_data = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($bill_data) {
-                $e_units = intval($bill_data['e_units'] ?? 0);
-                $w_units = intval($bill_data['w_units'] ?? 0);
-                $e_total = $e_units * $ELEC_RATE;
-                $w_total = $w_units * $WATER_RATE;
+                $e_units = floatval($bill_data['e_units'] ?? 0);
+                $w_units = floatval($bill_data['w_units'] ?? 0);
+                $e_total = round($e_units * $ELEC_RATE, 2);
+                $w_total = round($w_units * $WATER_RATE, 2);
 
                 $bill_calc = [
-                    'e_rate' => $ELEC_RATE,
-                    'w_rate' => $WATER_RATE,
+                    'e_rate' => number_format($ELEC_RATE, 2),
+                    'w_rate' => number_format($WATER_RATE, 2),
                     'e_total' => $e_total,
                     'w_total' => $w_total,
                     'grand_total' => $e_total + $w_total,
                     'month_text' => ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'][$month]
                 ];
             } else {
-                $bill_error = "ไม่พบข้อมูลบิลสำหรับบ้านพัก/เดือนนี้";
+                $bill_error = "ℹ️ ไม่พบข้อมูลบิลสำหรับบ้านพัก/เดือนนี้ อาจเป็นเพราะยังไม่มีการบันทึกค่ามิเตอร์";
             }
         } catch (PDOException $e) {
-            $bill_error = "เกิดข้อผิดพลาดในการดึงข้อมูล: " . htmlspecialchars($e->getMessage());
-            error_log("Bill query error: " . $e->getMessage());
+            $bill_error = "⚠️ เกิดข้อผิดพลาดในการดึงข้อมูล: " . htmlspecialchars($e->getMessage());
+            error_log("Bill query error on line " . $e->getLine() . ": " . $e->getMessage());
         }
     }
 }

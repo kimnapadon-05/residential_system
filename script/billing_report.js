@@ -1,7 +1,10 @@
+// ✅ billing_report.js - Generate and display billing reports
+// Backend: ../backend/billing_report_handler.php
+
 $(document).ready(function() {
     loadReport();
     
-    // อัปเดตหัวกระดาษเวลาสั่งพิมพ์
+    // Update print header when month/year changes
     $('#select_month, #select_year').change(function() {
         let m = $('#select_month option:selected').text();
         let y = $('#select_year option:selected').text();
@@ -13,7 +16,7 @@ function loadReport() {
     let m = $('#select_month').val();
     let y = $('#select_year').val();
 
-    // ตั้งค่าหัวกระดาษสำหรับพิมพ์
+    // Set print header
     let mText = $('#select_month option:selected').text();
     $('#print_month_year').text(mText + ' ' + y);
 
@@ -25,25 +28,29 @@ function loadReport() {
         data: { action: 'get_report', month: m, year: y },
         dataType: 'json',
         success: function(res) {
+            if (!res || res.status === 'error') {
+                console.error('Report Error:', res ? res.message : 'Unknown error');
+                $('#reportTable tbody').html('<tr><td colspan="8" class="text-center text-danger">ไม่สามารถโหลดรายงาน</td></tr>');
+                Swal.fire('Error', res ? res.message : 'เกิดข้อผิดพลาด', 'error');
+                return;
+            }
+
             if (res.status === 'success') {
                 
-                // --- [แก้ไข Logic ใหม่: เช็คว่ามีโซนไหนลืมตั้งค่าราคาไหม] ---
+                // ✅ Check for missing rates
                 if (res.missing_rates) {
-                    // ถ้ามีบ้านที่ไม่มีราคา (ราคาเป็น 0) ให้แจ้งเตือนสีแดง
                     $('#lbl_elec_rate, #lbl_water_rate').text('ข้อมูลไม่ครบ!').addClass('text-danger fw-bold');
                     Swal.fire('แจ้งเตือน', 'พบโซนที่ยังไม่ได้กำหนดราคาค่าไฟ/น้ำ ระบบจะคำนวณเป็น 0 บาท', 'warning');
                 } else {
-                    // ถ้าครบถ้วน ให้ขึ้นว่า "ตามพื้นที่"
                     $('#lbl_elec_rate, #lbl_water_rate').text('ตามพื้นที่').removeClass('text-danger fw-bold').css('color', '');
                 }
-                // -----------------------------------------------------
 
                 $('#sum_elec').text(res.summary.total_elec);
                 $('#sum_water').text(res.summary.total_water);
                 $('#sum_total').text(res.summary.grand_total);
 
                 let rows = '';
-                if (res.data.length > 0) {
+                if (res.data && res.data.length > 0) {
                     res.data.forEach(row => {
                         let e_price = parseFloat(row.elec_price).toLocaleString('th-TH', {minimumFractionDigits: 2});
                         let w_price = parseFloat(row.water_price).toLocaleString('th-TH', {minimumFractionDigits: 2});
@@ -76,7 +83,8 @@ function loadReport() {
                 Swal.fire('Error', res.message, 'error');
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
             Swal.fire('Error', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
         }
     });
