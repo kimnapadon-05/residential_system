@@ -53,7 +53,7 @@
             <button type="submit" class="btn btn-login w-100 py-2">เข้าสู่ระบบ</button>
         </form>
         <div class="text-center mt-3">
-            <a href="my_bill.php" class="text-decoration-none text-muted small"><i class="fas fa-arrow-left"></i> กลับไปหน้าลูกบ้าน</a>
+            <a href="index.php" class="text-decoration-none text-muted small"><i class="fas fa-arrow-left"></i> กลับไปหน้าลูกบ้าน</a>
         </div>
     </div>
 </div>
