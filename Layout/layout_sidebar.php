@@ -73,7 +73,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item text-danger" href="#" onclick="logout()">
+                            <a class="dropdown-item text-danger" href="backend/logout.php" onclick="logout()">
                                 <i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ
                             </a>
                         </li>
