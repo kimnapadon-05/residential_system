@@ -1,5 +1,5 @@
 <?php
-require_once '../Database/config.php';
+require_once 'Database/config.php';
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? '';

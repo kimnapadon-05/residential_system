@@ -1,6 +1,6 @@
-<?php include '../backend/auth_guard.php'; ?>
-<?php include '../Layout/layout_header.php'; ?>
-<?php include '../Layout/layout_sidebar.php'; ?>
+<?php include 'backend/auth_guard.php'; ?>
+<?php include 'Layout/layout_header.php'; ?>
+<?php include 'Layout/layout_sidebar.php'; ?>
 
 <div class="card shadow">
     <div class="card-header bg-secondary text-white">

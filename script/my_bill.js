@@ -5,7 +5,7 @@ $(document).ready(function() {
 // โหลดรายชื่อบ้านใส่ Dropdown
 function loadHouses() {
     $.ajax({
-        url: '../backend/my_bill_handler.php',
+        url: 'backend/my_bill_handler.php',
         method: 'POST',
         data: { action: 'get_houses' },
         dataType: 'json',
@@ -40,7 +40,7 @@ function checkBill() {
     });
 
     $.ajax({
-        url: '../backend/my_bill_handler.php',
+        url: 'backend/my_bill_handler.php',
         method: 'POST',
         data: { action: 'get_bill', house_id: hid, month: m, year: y },
         dataType: 'json',

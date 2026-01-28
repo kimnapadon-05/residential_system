@@ -1,9 +1,9 @@
-<?php include '../Layout/layout_header.php'; ?>
-<?php include '../Layout/layout_sidebar.php'; ?>
+<?php include 'Layout/layout_header.php'; ?>
+<?php include 'Layout/layout_sidebar.php'; ?>
 
 <div class="card shadow">
-    <div class="card-header bg-warning text-dark">
-        <h4 class="mb-0"><i class="fas fa-bolt"></i> จดบันทึกค่าไฟฟ้า</h4>
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="fas fa-tint"></i> จดบันทึกค่าน้ำประปา</h4>
     </div>
     <div class="card-body">
         <div class="row mb-4 g-2 align-items-end">
@@ -32,7 +32,7 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-primary w-100" onclick="loadSheet()">
+                <button class="btn btn-info w-100 text-white" onclick="loadSheet()">
                     <i class="fas fa-search"></i> ค้นหา
                 </button>
             </div>
@@ -44,7 +44,7 @@
                     <tr>
                         <th style="width: 15%;">บ้านพัก</th>
                         <th style="width: 20%;">ผู้พักอาศัย</th>
-                        <th style="width: 15%;">มิเตอร์</th>
+                        <th style="width: 15%;">มิเตอร์น้ำ</th>
                         <th style="width: 10%;">ครั้งก่อน</th>
                         <th style="width: 15%;">ครั้งนี้ (จด)</th>
                         <th style="width: 10%;">หน่วยใช้</th>
@@ -59,4 +59,4 @@
 </div>
 
 <?php include '../Layout/layout_footer.php'; ?>
-<script src="../script/electric_recording_handler.js"></script>
+<script src="../script/water_recording.js"></script>

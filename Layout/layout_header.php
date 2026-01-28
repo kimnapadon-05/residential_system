@@ -1,4 +1,4 @@
-<?php include '../backend/auth_guard.php'; ?>
+<?php include 'backend/auth_guard.php'; ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>

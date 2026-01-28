@@ -1,5 +1,5 @@
-<?php include '../Layout/layout_header.php'; ?>
-<?php include '../Layout/layout_sidebar.php'; ?>
+<?php include 'Layout/layout_header.php'; ?>
+<?php include 'Layout/layout_sidebar.php'; ?>
 
 <div class="card shadow mb-4">
     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">

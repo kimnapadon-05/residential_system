@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db_name = 'test'; // <-- เช็คชื่อฐานข้อมูลตรงนี้ให้ตรงกับ phpMyAdmin
+$db_name = 'residential'; // <-- เช็คชื่อฐานข้อมูลตรงนี้ให้ตรงกับ phpMyAdmin
 $username = 'root';
 $password = '';
 

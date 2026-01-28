@@ -1,5 +1,5 @@
-<?php include '../Layout/layout_header.php'; ?>
-<?php include '../Layout/layout_sidebar.php'; ?>
+<?php include 'Layout/layout_header.php'; ?>
+<?php include 'Layout/layout_sidebar.php'; ?>
 
 <h3 class="mt-4 mb-4">Dashboard</h3>
 
