@@ -1,22 +1,16 @@
 <?php
 session_start();
-include 'Database/config.php'; 
+// ตรวจสอบไฟล์ config ก่อน
+if(file_exists('Database/config.php')){
+    include 'Database/config.php'; 
+}
 header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:;");
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self' 'unsafe-inline' 'unsafe-eval' 
-               https://cdn.jsdelivr.net 
-               https://code.jquery.com 
-               https://cdnjs.cloudflare.com 
-               https://fonts.googleapis.com 
-               https://fonts.gstatic.com;
-               img-src 'self' data:;">
     <title>ตรวจสอบค่าสาธารณูปโภค - บ้านพักครู</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,93 +18,20 @@ header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background-color: #f0f2f5; 
-            min-height: 100vh; /* ให้หน้าจอมีความสูงอย่างน้อยเต็มจอ */
-            display: flex;
-            flex-direction: column;
-        }
-        
+        body { font-family: 'Kanit', sans-serif; background-color: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; }
         .container-search { max-width: 900px; margin: 40px auto; }
-        
-        .invoice-box {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            display: none; 
-            width: 100%;          /* ยืดให้เต็ม Wrapper */
-            max-width: 210mm;     /* แต่ไม่เกิน A4 */
-        }
-        
+        .invoice-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: none; width: 100%; max-width: 210mm; }
         .invoice-header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
         .table-invoice th { background-color: #f8f9fa; text-align: center; vertical-align: middle; }
         .table-invoice td { vertical-align: middle; }
+        .invoice-wrapper { display: flex; justify-content: center; width: 100%; padding: 0 15px; }
         
-        /* จัดให้อยู่กึ่งกลางหน้าจอ */
-        .invoice-wrapper {
-            display: flex;
-            justify-content: center; /* กึ่งกลางแนวนอน */
-            width: 100%;
-            padding: 0 15px; /* เว้นขอบซ้ายขวาเล็กน้อยกันชิดขอบจอเกินไปในมือถือ */
-        }
-
         @media print {
-
-            @page { 
-            size: A4 portrait;
-            /* กำหนดขอบ: บน ขวา ล่าง ซ้าย */
-            /* ตัวอย่าง: บน 20mm, ขวา 10mm, ล่าง 10mm, ซ้าย 10mm */
-            margin: 20mm 10mm 10mm 10mm; 
-        }
-            /* 1. ซ่อนส่วนที่ไม่ต้องการ (ปุ่ม, เมนูค้นหา) */
+            @page { size: A4 portrait; margin: 20mm 10mm 10mm 10mm; }
             .no-print { display: none !important; }
-            
-            /* 2. รีเซ็ตพื้นหลังเป็นสีขาว */
-            body, html { 
-                background-color: white !important; 
-                height: auto !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            /* 3. จัด Wrapper ให้ยึดตำแหน่งหัวกระดาษและจัดกึ่งกลาง */
-            .invoice-wrapper {
-                position: absolute; /* ยึดกับมุมกระดาษ */
-                top: 0;
-                left: 0;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                
-                /* ใช้ Flexbox จัดกึ่งกลางแนวนอน */
-                display: flex !important;
-                justify-content: center !important; 
-                align-items: flex-start !important; 
-            }
-
-            /* 4. ปรับกล่องใบแจ้งหนี้ให้พอดีกระดาษ */
-            .invoice-box {
-                display: block !important;
-                
-                /* กำหนดขนาดให้พอดี A4 */
-                width: 100% !important;
-                max-width: 210mm !important; 
-                
-                /* คำสั่งจัดกึ่งกลาง (สำคัญ) */
-                margin: 0 auto !important;   
-                
-                /* ยกเลิกการบังคับตำแหน่งแบบเดิม */
-                position: static !important; 
-                left: auto !important;
-                top: auto !important;
-                
-                /* ตกแต่งเล็กน้อย */
-                padding: 20px !important;
-                box-shadow: none !important;
-                border: 1px solid #ddd !important; /* ใส่ขอบบางๆ ให้ดูเป็นเอกสาร */
-            }
+            body, html { background-color: white !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
+            .invoice-wrapper { position: absolute; top: 0; left: 0; width: 100% !important; margin: 0 !important; padding: 0 !important; display: flex !important; justify-content: center !important; align-items: flex-start !important; }
+            .invoice-box { display: block !important; width: 100% !important; max-width: 210mm !important; margin: 0 auto !important; position: static !important; padding: 20px !important; box-shadow: none !important; border: 1px solid #ddd !important; }
         }
     </style>
 </head>
@@ -244,7 +165,6 @@ header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval
             </table>
 
             <div class="mt-5 p-3 bg-light border rounded text-center">
-                <!-- <p class="mb-1 text-danger fw-bold"><i class="fas fa-exclamation-circle"></i> กรุณาชำระเงินภายในวันที่ 5 ของเดือนถัดไป</p> -->
                 <small class="text-muted">หากมีข้อสงสัยกรุณาติดต่อเจ้าหน้าที่ดูแลระบบ</small>
             </div>
 
@@ -258,13 +178,6 @@ header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval
             </div>
         </div>
     </div>
-    <script>
-    function loadBill(houseId) {
-        document.getElementById('billBox').style.display = 'block';
-        document.getElementById('billFrame').src =
-            'my_bill.php?house_id=' + houseId;
-    }
-    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

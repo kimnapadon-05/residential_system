@@ -147,5 +147,5 @@
     </div>
 </div>
 
-<?php include '../Layout/layout_footer.php'; ?>
-<script src="../script/residency_handler.js"></script>
+<?php include 'Layout/layout_footer.php'; ?>
+<script src="script/residency_handler.js"></script>

@@ -1,18 +1,14 @@
 <?php
-// db_connect.php
-$servername = "localhost"; // หรือ IP เซิร์ฟเวอร์ของคุณ
-$username = "root";       // ชื่อผู้ใช้ฐานข้อมูล
-$password = "";           // รหัสผ่าน
-$dbname = "residential"; // ชื่อฐานข้อมูล
+$host = 'localhost';
+$db_name = 'residential'; // <-- เช็คชื่อฐานข้อมูลตรงนี้ให้ตรงกับ phpMyAdmin
+$username = 'root';
+$password = '';
 
-// สร้างการเชื่อมต่อ
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// ตั้งค่า charset เป็น utf8
-$conn->set_charset("utf8");
-
-// ตรวจสอบการเชื่อมต่อ
-if ($conn->connect_error) {
-  die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    // ถ้าเชื่อมต่อไม่ได้ ให้หยุดทำงานและแสดง Error ทันที
+    die("Connection failed: " . $e->getMessage());
 }
 ?>
