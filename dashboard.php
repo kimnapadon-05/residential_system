@@ -1,6 +1,13 @@
-<?php include 'Layout/layout_header.php'; ?>
-<?php include 'Layout/layout_sidebar.php'; ?>
-
+<?php
+session_start();
+// ตรวจสอบไฟล์ config ก่อน
+if(file_exists('Database/config.php')){
+    include 'Database/config.php'; 
+}
+header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:;");
+include 'Layout/layout_header.php'; 
+include 'Layout/layout_sidebar.php'; 
+?>
 <h3 class="mt-4 mb-4">Dashboard</h3>
 
 <div class="row g-3 mb-4">

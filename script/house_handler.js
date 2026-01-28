@@ -21,7 +21,7 @@ function loadTable(page, search = '') {
     if(search === '') search = $('#searchInput').val(); // กันเหนียวกรณีเปลี่ยนหน้า
 
     $.ajax({
-        url: '../backend/house_handler.php',
+        url: 'backend/house_handler.php',
         method: 'POST',
         data: { action: 'read', page: page, limit: itemsPerPage, search: search },
         dataType: 'json',
@@ -75,7 +75,7 @@ function renderPagination(paging) {
 }
 
 function loadLocations() {
-    $.post('../backend/house_handler.php', {action:'get_locations'}, function(data){
+    $.post('backend/house_handler.php', {action:'get_locations'}, function(data){
         let opts = '<option value="">-- เลือกโซน --</option>';
         data.forEach(item => {
             opts += `<option value="${item.location_id}">${item.location_name}</option>`;
@@ -90,7 +90,7 @@ function saveHouse() {
         return;
     }
 
-    $.post('../backend/house_handler.php', $('#houseForm').serialize(), function(res){
+    $.post('backend/house_handler.php', $('#houseForm').serialize(), function(res){
         if(res.status === 'success'){
             $('#houseModal').modal('hide');
             Swal.fire('สำเร็จ', res.message, 'success');

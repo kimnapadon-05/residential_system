@@ -18,7 +18,7 @@ $(document).ready(function() {
         let houseId = $(this).val();
         if (houseId) {
             $.ajax({
-                url: '../backend/residency_handler.php',
+                url: 'backend/residency_handler.php',
                 method: 'POST',
                 data: { action: 'get_last_reading', house_id: houseId },
                 dataType: 'json',
@@ -42,7 +42,7 @@ function loadHistory(page, search = '') {
     if(search === '') search = $('#searchInput').val();
 
     $.ajax({
-        url: '../backend/residency_handler.php', 
+        url: 'backend/residency_handler.php', 
         method: 'POST', 
         data: { 
             action: 'read',
@@ -134,7 +134,7 @@ function renderPagination(paging) {
 // โหลดข้อมูลใส่ Dropdown
 function loadFormData() {
     $.ajax({
-        url: '../backend/residency_handler.php', method: 'POST', data: { action: 'get_form_data' }, dataType: 'json',
+        url: 'backend/residency_handler.php', method: 'POST', data: { action: 'get_form_data' }, dataType: 'json',
         success: function(res) {
             let pOpt = '<option value="">-- เลือกผู้พัก --</option>';
             res.people.forEach(p => pOpt += `<option value="${p.person_id}">${p.name}</option>`);
@@ -181,7 +181,7 @@ function saveMoveIn() {
         return;
     }
     $.ajax({
-        url: '../backend/residency_handler.php', method: 'POST', data: $('#moveInForm').serialize(), dataType: 'json',
+        url: 'backend/residency_handler.php', method: 'POST', data: $('#moveInForm').serialize(), dataType: 'json',
         success: function(res) {
             if(res.status == 'success') {
                 $('#moveInModal').modal('hide');
@@ -204,7 +204,7 @@ function saveMoveOut() {
     if(finalWater < startWater) { Swal.fire('ข้อมูลไม่ถูกต้อง', `มิเตอร์น้ำ (${finalWater}) ต่ำกว่าค่าเริ่มต้น (${startWater})`, 'warning'); return; }
 
     $.ajax({
-        url: '../backend/residency_handler.php', method: 'POST', data: $('#moveOutForm').serialize(), dataType: 'json',
+        url: 'backend/residency_handler.php', method: 'POST', data: $('#moveOutForm').serialize(), dataType: 'json',
         success: function(res) {
             if(res.status == 'success') {
                 $('#moveOutModal').modal('hide');

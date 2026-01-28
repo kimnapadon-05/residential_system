@@ -10,7 +10,7 @@ function loadSheet() {
 
     $.ajax({
         // เรียกไฟล์ Backend ของค่าน้ำ
-        url: '../backend/water_recording_handler.php',
+        url: 'backend/water_recording_handler.php',
         method: 'POST',
         data: { action: 'load_sheet', month: m, year: y },
         dataType: 'json',
@@ -93,7 +93,7 @@ function saveRow(id) {
     btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
 
     $.ajax({
-        url: '../backend/water_recording_handler.php',
+        url: 'backend/water_recording_handler.php',
         method: 'POST',
         data: { 
             action: 'save_reading', 

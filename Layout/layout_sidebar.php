@@ -9,7 +9,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </div>
     <div class="list-group list-group-flush mt-2">
         
-        <a href="index.php" class="list-group-item list-group-item-action <?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">
+        <a href="dashboard.php" class="list-group-item list-group-item-action <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
             <i class="fas fa-chart-pie me-2 fixed-width-icon"></i> แดชบอร์ด
         </a>
         

@@ -22,7 +22,7 @@ function loadMeterTable(page, search = '') {
     if(search === '') search = $('#searchInput').val();
 
     $.ajax({
-        url: '../backend/meter_handler.php', 
+        url: 'backend/meter_handler.php', 
         method: 'POST', 
         data: { 
             action: 'read',
@@ -116,7 +116,7 @@ function renderPagination(paging) {
 // โหลดตัวเลือกยี่ห้อใส่ Dropdown
 function loadOptions() {
     $.ajax({
-        url: '../backend/meter_handler.php', method: 'POST', data: { action: 'get_options' }, dataType: 'json',
+        url: 'backend/meter_handler.php', method: 'POST', data: { action: 'get_options' }, dataType: 'json',
         success: function(res) {
             if(res.error) {
                 console.error(res.error);
@@ -155,7 +155,7 @@ function saveMeter() {
         return;
     }
     $.ajax({
-        url: '../backend/meter_handler.php', method: 'POST', data: $('#meterForm').serialize(), dataType: 'json',
+        url: 'backend/meter_handler.php', method: 'POST', data: $('#meterForm').serialize(), dataType: 'json',
         success: function(res) {
             if(res.status == 'success') { 
                 $('#meterModal').modal('hide'); 
@@ -172,7 +172,7 @@ function saveMeter() {
 function deleteMeter(id) {
     Swal.fire({ title: 'ยืนยันการลบ?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' }).then((r) => {
         if(r.isConfirmed) {
-            $.post('../backend/meter_handler.php', {action:'delete', meter_id:id}, (res) => {
+            $.post('backend/meter_handler.php', {action:'delete', meter_id:id}, (res) => {
                 if (res.status === 'success') {
                     loadMeterTable(currentPage); // โหลดหน้าเดิมหลังลบ
                     Swal.fire('Deleted','ลบข้อมูลเรียบร้อย','success'); 

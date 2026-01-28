@@ -22,7 +22,7 @@ function loadPersonTable(page, search = '') {
     if(search === '') search = $('#searchInput').val();
 
     $.ajax({
-        url: '../backend/person_handler.php', 
+        url: 'backend/person_handler.php', 
         method: 'POST', 
         data: { 
             action: 'read', 
@@ -110,7 +110,7 @@ function renderPagination(paging) {
 // โหลดตำแหน่งใส่ Dropdown
 function loadPositions() {
     $.ajax({
-        url: '../backend/person_handler.php', method: 'POST', data: { action: 'get_positions' }, dataType: 'json',
+        url: 'backend/person_handler.php', method: 'POST', data: { action: 'get_positions' }, dataType: 'json',
         success: function(data) {
             let opts = '<option value="">เลือกตำแหน่ง</option>';
             data.forEach(p => {
@@ -143,7 +143,7 @@ function editPerson(id, fname, lname, posId) {
 // บันทึกข้อมูล
 function savePerson() {
     $.ajax({
-        url: '../backend/person_handler.php', method: 'POST', data: $('#personForm').serialize(), dataType: 'json',
+        url: 'backend/person_handler.php', method: 'POST', data: $('#personForm').serialize(), dataType: 'json',
         success: function(res) {
             if(res.status === 'success') {
                 Swal.fire('สำเร็จ', res.message, 'success');
@@ -166,7 +166,7 @@ function deletePerson(id) {
         cancelButtonText: 'ยกเลิก'
     }).then((r) => {
         if(r.isConfirmed) {
-            $.post('../backend/person_handler.php', { action: 'delete', person_id: id }, function(res) {
+            $.post('backend/person_handler.php', { action: 'delete', person_id: id }, function(res) {
                 if(res.status === 'success') {
                     loadPersonTable(currentPage);
                     Swal.fire('Deleted', 'ลบข้อมูลสำเร็จ', 'success');

@@ -1,10 +1,22 @@
 <?php
 // ไฟล์: backend/my_bill_handler.php
 
-header('Content-Type: application/json');
+// ปิดการแสดงผล warnings ในหน้าผลลัพธ์ (ส่ง JSON เท่านั้น)
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ob_start();
 
-// เรียกไฟล์ config โดยถอยหลัง 1 ชั้น (..) ไปหาโฟลเดอร์ Database
-require_once '../Database/config.php'; 
+require_once '../Database/config.php';
+
+function send_json($data, $http_code = 200) {
+    if (ob_get_length()) {
+        @ob_clean();
+    }
+    http_response_code($http_code);
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit;
+}
 
 $action = $_POST['action'] ?? '';
 
@@ -12,12 +24,11 @@ $action = $_POST['action'] ?? '';
 if ($action == 'get_houses') {
     try {
         $stmt = $conn->query("SELECT house_id, house_name FROM house_info ORDER BY house_name ASC");
-        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        // ส่งเป็น Array ของ object (JavaScript จะเรียก data.forEach)
+        send_json($stmt->fetchAll(PDO::FETCH_ASSOC));
     } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        send_json(['status' => 'error', 'message' => $e->getMessage()], 500);
     }
-    exit;
 }
 
 // --- ACTION 2: ดึงข้อมูลบิล ---
@@ -27,9 +38,8 @@ if ($action == 'get_bill') {
     $year = $_POST['year'] ?? null;
 
     // ตรวจสอบว่าส่งค่ามาครบไหม
-    if(!$house_id || !$month || !$year) {
-        echo json_encode(['status' => 'error', 'message' => 'Missing parameters']);
-        exit;
+    if (!$house_id || !$month || !$year) {
+        send_json(['status' => 'error', 'message' => 'Missing parameters'], 400);
     }
 
     try {
@@ -39,7 +49,7 @@ if ($action == 'get_bill') {
         $rates = $stmtRate->fetch(PDO::FETCH_ASSOC);
 
         // กำหนดค่า Default หากไม่เจอเรทในเดือนนั้น
-        $ELEC_RATE = $rates ? $rates['elec_rate'] : 7; 
+        $ELEC_RATE = $rates ? $rates['elec_rate'] : 7;
         $WATER_RATE = $rates ? $rates['water_rate'] : 15;
 
         // 2. Query ดึงข้อมูลการใช้น้ำ/ไฟ และชื่อผู้พัก
@@ -57,7 +67,7 @@ if ($action == 'get_bill') {
 
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            ':hid' => $house_id, 
+            ':hid' => $house_id,
             ':m' => $month, ':y' => $year,
             ':m1' => $month, ':y1' => $year,
             ':m2' => $month, ':y2' => $year
@@ -66,10 +76,10 @@ if ($action == 'get_bill') {
 
         if ($result) {
             // คำนวณยอดเงิน
-            $e_total = intval($result['e_units']??0) * $ELEC_RATE;
-            $w_total = intval($result['w_units']??0) * $WATER_RATE;
-            
-            echo json_encode([
+            $e_total = intval($result['e_units'] ?? 0) * $ELEC_RATE;
+            $w_total = intval($result['w_units'] ?? 0) * $WATER_RATE;
+
+            send_json([
                 'status' => 'success',
                 'data' => $result,
                 'calc' => [
@@ -78,11 +88,13 @@ if ($action == 'get_bill') {
                     'grand_total' => $e_total + $w_total
                 ]
             ]);
-        } else { 
-            echo json_encode(['status' => 'not_found']); 
+        } else {
+            send_json(['status' => 'not_found']);
         }
-    } catch (PDOException $e) { 
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]); 
+    } catch (PDOException $e) {
+        send_json(['status' => 'error', 'message' => $e->getMessage()], 500);
     }
 }
-?>
+
+// หากไม่มี action ที่รองรับ ให้ส่งค่าเริ่มต้น (empty array)
+send_json([]);

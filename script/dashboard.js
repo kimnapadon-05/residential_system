@@ -3,41 +3,29 @@ $(document).ready(function() {
 });
 
 function loadDashboardData() {
-    $.ajax({
-        url: '../backend/dashboard_handler.php',
-        method: 'POST',
-        data: { action: 'get_stats' },
+        $.ajax({
+        url: 'backend/dashboard_handler.php', // เช็ค path ไฟล์ดีๆ นะ
+        type: 'POST',
         dataType: 'json',
-        success: function(data) {
-            if (data.status === 'success') {
-                // 1. Update Cards
-                $('#stat_total_houses').text(data.stats.total_houses);
-                $('#stat_occupied').text(data.stats.occupied);
-                $('#stat_vacant').text(data.stats.vacant);
-                $('#stat_people').text(data.stats.people);
+        data: {
+            action: 'get_stats' // <--- ต้องมีตัวนี้ เป๊ะๆ ตาม PHP
+        },
+        success: function(response) {
+            // ลอง log ออกมาดูก่อน
+            console.log("Response:", response);
 
-                // 2. Update List
-                let listHtml = '';
-                if (data.recent_movein.length > 0) {
-                    data.recent_movein.forEach(item => {
-                        listHtml += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>${item.person_fname} ${item.person_lname}</strong><br>
-                                    <small class="text-muted">บ้าน ${item.house_name}</small>
-                                </div>
-                                <span class="badge bg-light text-dark">${item.move_in_date}</span>
-                            </li>
-                        `;
-                    });
-                } else {
-                    listHtml = '<li class="list-group-item text-center text-muted">ยังไม่มีข้อมูล</li>';
-                }
-                $('#recent_list').html(listHtml);
-
-                // 3. Render Chart
-                renderChart(data.chart);
+            if (response.status === 'success') {
+                // เอา data ไปโชว์
+                $('#total_houses').text(response.stats.total_houses);
+                // ...
+            } else {
+                console.error("Error from Server:", response.message);
             }
+        },
+        error: function(xhr, status, error) {
+            // ถ้าไม่เข้า success มาดูตรงนี้
+            console.error("AJAX Error:", status, error);
+            console.log(xhr.responseText); // ดู error ที่ PHP พ่นออกมา
         }
     });
 }

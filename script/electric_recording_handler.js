@@ -9,7 +9,7 @@ function loadSheet() {
     $('#recordingTable tbody').html('<tr><td colspan="7" class="text-center">กำลังโหลดข้อมูล...</td></tr>');
 
     $.ajax({
-        url: '../backend/electric_reading_handler.php',
+        url: 'backend/electric_reading_handler.php',
         method: 'POST',
         data: { action: 'load_sheet', month: m, year: y },
         dataType: 'json',

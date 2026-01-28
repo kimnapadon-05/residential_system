@@ -20,7 +20,7 @@ function loadReport() {
     $('#reportTable tbody').html('<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...</td></tr>');
 
     $.ajax({
-        url: '../backend/billing_report_handler.php',
+        url: 'backend/billing_report_handler.php',
         method: 'POST',
         data: { action: 'get_report', month: m, year: y },
         dataType: 'json',
