@@ -76,6 +76,6 @@
     </div>
 </div>
 
-<?php include '../Layout/layout_footer.php'; ?>
+<?php include 'Layout/layout_footer.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="../script/dashboard.js"></script>
+<script src="script/dashboard.js"></script>

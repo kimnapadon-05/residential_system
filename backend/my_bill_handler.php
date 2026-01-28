@@ -5,8 +5,12 @@ require_once 'Database/config.php';
 $action = $_POST['action'] ?? '';
 
 if ($action == 'get_houses') {
-    $stmt = $conn->query("SELECT house_id, house_name FROM house_info ORDER BY house_name ASC");
-    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    try {
+        $stmt = $conn->query("SELECT house_id, house_name FROM house_info ORDER BY house_name ASC");
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
     exit;
 }
 

@@ -58,5 +58,5 @@
     </div>
 </div>
 
-<?php include '../Layout/layout_footer.php'; ?>
+<?php include 'Layout/layout_footer.php'; ?>
 <script src="../script/electric_recording_handler.js"></script>

@@ -198,5 +198,5 @@
     }
 </style>
 
-<?php include '../Layout/layout_footer.php'; ?>
+<?php include 'Layout/layout_footer.php'; ?>
 <script src="../script/billing_report.js"></script>

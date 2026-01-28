@@ -77,5 +77,5 @@
     </div>
 </div>
 
-<?php include '../Layout/layout_footer.php'; ?>
+<?php include 'Layout/layout_footer.php'; ?>
 <script src="../script/person_handler.js"></script>
